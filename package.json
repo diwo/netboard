@@ -2,13 +2,18 @@
   "name": "netboard",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "server/server.js",
   "scripts": {
     "test": "true"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "rxjs": "^6.5.2",
+    "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/requirejs": "^2.1.31"
   }
 }

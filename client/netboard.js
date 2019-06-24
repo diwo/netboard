@@ -1,4 +1,4 @@
-define(['settings', 'input', 'draw'], function(settings, input, draw) {
+define(['settings', 'input', 'draw', 'net', 'state'], function(settings, input, draw, net, state) {
   var holding = null;
   var boxes = [];
   boxes.push({x: 200, y: 100, style: 'rgb(40, 120, 255)'});
@@ -54,8 +54,8 @@ define(['settings', 'input', 'draw'], function(settings, input, draw) {
 
   function getBox({x, y}) {
     for (let box of boxes) {
-      if (inRange(x, settings.canvas.x + box.x, settings.box.w) &&
-          inRange(y, settings.canvas.y + box.y, settings.box.h)) {
+      if (inRange(x, settings.board.x + box.x, settings.box.w) &&
+          inRange(y, settings.board.y + box.y, settings.box.h)) {
         return box;
       }
     }
@@ -67,7 +67,7 @@ define(['settings', 'input', 'draw'], function(settings, input, draw) {
   }
 
   function handleDraw() {
-    draw.bg(settings.canvas);
+    draw.bg(settings.board);
     // Draw foreground last
     for (let i=0; i<boxes.length; i++) {
       drawBox(boxes[boxes.length - i - 1]);
@@ -80,8 +80,8 @@ define(['settings', 'input', 'draw'], function(settings, input, draw) {
   function drawBox(box, borderStyle) {
     draw.square({
       ...settings.box,
-      x: settings.canvas.x + box.x,
-      y: settings.canvas.y + box.y,
+      x: settings.board.x + box.x,
+      y: settings.board.y + box.y,
       style: box.style,
       borderStyle
     });

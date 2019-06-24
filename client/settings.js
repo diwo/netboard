@@ -1,5 +1,5 @@
 define({
-  canvas: {
+  board: {
     x: 10, y: 10, w: 1000, h: 600, borderWidth: 4
   },
   box: {

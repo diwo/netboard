@@ -10,8 +10,8 @@ define(['settings'], function(settings) {
     canvas.margin = 0;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    settings.canvas.x = (window.innerWidth-settings.canvas.w)/2;
-    settings.canvas.y = (window.innerHeight-settings.canvas.h)/2;
+    settings.board.x = (window.innerWidth-settings.board.w)/2;
+    settings.board.y = (window.innerHeight-settings.board.h)/2;
   }
 
   return { canvas, ctx };
