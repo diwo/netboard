@@ -1,46 +1,57 @@
 (function() {
   /** @type { { amd: string, commonjs: string }[] } */
   const deps = [
-    { amd: 'rxjs', commonjs: 'rxjs' }
+    { amd: 'rxjs', commonjs: '../server/rxjs' }
   ];
 
   /**
-   * @param { import('rxjs') } rxjs
+   * @param { import('../types/rxjs') } rxjs
    */
   function factory(rxjs) {
+    const { merge } = rxjs;
+    const { map, scan } = rxjs.operators;
+
     return (initialState) => {
-      let currentState = initialState;
-
-      function toTransformer({isLocalSrc}) {
-        return (changes) => {
-          return (state) => {
-            currentState = changes.reduce((prevState, change) => {
-              let obj = prevState[change.id];
-              let isLocalChange = isLocalSrc && obj.isAuthoritative;
-              let isRemoteChange = !isLocalSrc && !obj.isAuthoritative;
-              let isPredictiveChange = isLocalSrc && !obj.isAuthoritative;
-              if (isLocalChange || isRemoteChange) {
-                return applyChange(prevState, change, { isAuthoritative: true });
-              } else if (isPredictiveChange) {
-                return applyChange(prevState, change, { isAuthoritative: false });
-              } else {
-                return prevState;
-              }
-            }, state);
-            return currentState;
-          };
-        };
-      }
-
-      function applyChange() {}
-
       return (input$, network$) => {
-        return rxjs.merge(
-          input$.pipe(rxjs.map(toTransformer({ isLocalSrc: true }))),
-          network$.pipe(rxjs.map(toTransformer({ isLocalSrc: false })))
-        ).pipe(rxjs.map(transform => transform(currentState)));
+        return merge(
+          input$.pipe(map(toTransformer({ isLocalChange: true }))),
+          network$.pipe(map(toTransformer({ isLocalChange: false })))
+        ).pipe(scan((state, transform) => transform(state), initialState));
       };
     };
+
+    function toTransformer({ isLocalChange }) {
+      return (changes) => {
+        return (state) => {
+          return changes.reduce((prevState, change) => {
+            let prevObj = prevState[change.id];
+            let updateStrategy = getUpdateStrategy({
+              isLocalChange,
+              isLocalAuthority: obj.isLocalAuthority
+            });
+            return {
+              ...prevState,
+              [change.id]: updateStrategy(prevObj, change.data)
+            };
+          }, state);
+        };
+      };
+    }
+
+    function getUpdateStrategy({ isLocalChange, isLocalAuthority }) {
+      let isFinal = (isLocalChange && isLocalAuthority) || (!isLocalChange && !isLocalAuthority);
+      let isPredictive = isLocalChange && !isLocalAuthority;
+      if (!isFinal && !isPredictive) {
+        return obj => obj;
+      }
+      return (obj, data) => {
+        return updateObject(obj, data, { isFinal });
+      };
+    }
+
+    function updateObject(obj, data, { isFinal }) {
+      // ???
+    }
   }
 
   // UMD boilerplate

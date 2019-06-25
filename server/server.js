@@ -1,7 +1,7 @@
 const http = require('http');
 const express = require('express');
 const io = require('socket.io');
-const rxjs = require('rxjs');
+const { fromEvent } = require('./rxjs');
 // const state = require('../shared/state');
 
 const app = express();
@@ -14,7 +14,7 @@ const ioServer = io(httpServer, {
   pingTimeout: 30000
 });
 
-rxjs.fromEvent(ioServer, 'connection').subscribe(handleConn);
+fromEvent(ioServer, 'connection').subscribe(handleConn);
 
 /**
  * @param {SocketIO.Socket} socket 
@@ -22,8 +22,8 @@ rxjs.fromEvent(ioServer, 'connection').subscribe(handleConn);
 function handleConn(socket) {
   console.log(`${socket.id} connected`);
 
-  let msg$ = rxjs.fromEvent(socket, 'msg');
-  let disconnect$ = rxjs.fromEvent(socket, 'disconnect');
+  let msg$ = fromEvent(socket, 'msg');
+  let disconnect$ = fromEvent(socket, 'disconnect');
 
   msg$.subscribe(msg => {
     console.log('client said', msg);
